@@ -1,15 +1,15 @@
 {
-  "name": "typed-scss-modules",
-  "version": "0.0.13",
-  "description": "TypeScript type definition generator for SCSS CSS Modules",
+  "name": "typed-image-modules",
+  "version": "0.0.1",
+  "description": "SCSS type definition generator for images",
   "main": "index.js",
-  "author": "Spencer Miskoviak <smiskoviak@gmail.com>",
+  "author": "Alex Batalov <radist2s@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/skovy/typed-scss-modules.git"
+    "url": "https://github.com/radist2s/typed-image-modules.git"
   },
-  "homepage": "https://github.com/skovy/typed-scss-modules.git#readme",
+  "homepage": "https://github.com/radist2s/typed-image-modules.git#readme",
   "keywords": [
     "scss",
     "css modules",
