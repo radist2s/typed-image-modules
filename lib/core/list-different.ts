@@ -3,18 +3,17 @@ import fs from "fs";
 
 import { alerts } from "./alerts";
 import { MainOptions } from "./types";
-import { fileToClassNames } from "../sass";
-import {
-  classNamesToTypeDefinitions,
-  getTypeDefinitionPath
-} from "../typescript";
+import { fileToImageSize } from "../sass";
+import { classNamesToTypeDefinitions, getDefinitionPath } from "../typescript";
 
 export const listDifferent = async (
-  pattern: string,
+  patterns: string[],
   options: MainOptions
 ): Promise<void> => {
   // Find all the files that match the provied pattern.
-  const files = glob.sync(pattern);
+  const files = patterns
+    .map(pattern => glob.sync(pattern))
+    .reduce((filesAll, filesGroup) => filesAll.concat(filesGroup));
 
   if (!files || !files.length) {
     alerts.notice("No files found.");
@@ -34,10 +33,10 @@ export const checkFile = (
   options: MainOptions
 ): Promise<boolean> => {
   return new Promise(resolve =>
-    fileToClassNames(file, options).then(classNames => {
+    fileToImageSize(file, options).then(classNames => {
       const typeDefinition = classNamesToTypeDefinitions(
         classNames,
-        options.exportType
+        options.exportVariables
       );
 
       if (!typeDefinition) {
@@ -46,7 +45,7 @@ export const checkFile = (
         return;
       }
 
-      const path = getTypeDefinitionPath(file);
+      const path = getDefinitionPath(file);
 
       const content = fs.readFileSync(path, { encoding: "UTF8" });
 

@@ -7,15 +7,22 @@ import { writeFile } from "./write-file";
 /**
  * Given a file glob generate the corresponding types once.
  *
- * @param pattern the file pattern to generate type definitions for
+ * @param patterns the file pattern to generate type definitions for
  * @param options the CLI options
  */
 export const generate = async (
-  pattern: string,
+  patterns: string[] | string,
   options: MainOptions
 ): Promise<void> => {
   // Find all the files that match the provided pattern.
-  const files = glob.sync(pattern, { ignore: options.ignore });
+
+  if (typeof patterns === "string") {
+    patterns = [patterns];
+  }
+
+  const files = patterns
+    .map(pattern => glob.sync(pattern, { ignore: options.ignore }))
+    .reduce((filesAll, filesGroup) => filesAll.concat(filesGroup));
 
   if (!files || !files.length) {
     alerts.error("No files found.");
@@ -26,7 +33,7 @@ export const generate = async (
   // provide a (hopefully) helpful warning.
   if (files.length === 1) {
     alerts.warn(
-      `Only 1 file found for ${pattern}. If using a glob pattern (eg: dir/**/*.scss) make sure to wrap in quotes (eg: "dir/**/*.scss").`
+      `Only 1 file found for ${patterns}. If using a glob pattern (eg: dir/**/*.scss) make sure to wrap in quotes (eg: "dir/**/*.scss").`
     );
   }
 

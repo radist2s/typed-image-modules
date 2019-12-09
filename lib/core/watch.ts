@@ -7,14 +7,14 @@ import { MainOptions } from "./types";
 /**
  * Watch a file glob and generate the corresponding types.
  *
- * @param pattern the file pattern to watch for file changes or additions
+ * @param patterns the file pattern to watch for file changes or additions
  * @param options the CLI options
  */
-export const watch = (pattern: string, options: MainOptions): void => {
+export const watch = (patterns: string[], options: MainOptions): void => {
   alerts.success("Watching files...");
 
   chokidar
-    .watch(pattern, {
+    .watch(patterns, {
       ignoreInitial: options.ignoreInitial,
       ignored: options.ignore
     })

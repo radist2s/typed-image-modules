@@ -2,64 +2,54 @@
 
 import yargs from "yargs";
 
-import { Aliases, NAME_FORMATS, NameFormat } from "./sass";
-import { ExportType, EXPORT_TYPES } from "./typescript";
+import {
+  NAME_FORMATS,
+  nameFormatDefault,
+  defaultImageTypes,
+  moduleNameFormatDefault
+} from "./sass";
 import { main } from "./main";
-
-const nameFormatDefault: NameFormat = "camel";
-const exportTypeDefault: ExportType = "named";
 
 const { _: patterns, ...rest } = yargs
   .usage(
-    "Generate .scss.d.ts from CSS module .scss files.\nUsage: $0 <glob pattern> [options]"
-  )
-  .example("$0 src", "All .scss files at any level in the src directoy")
-  .example(
-    "$0 src/**/*.scss",
-    "All .scss files at any level in the src directoy"
+    "Generate .svg.scss from image files containing image size variables.\nUsage: $0 <glob pattern> [<glob pattern>] [options]"
   )
   .example(
-    "$0 src/**/*.scss --watch",
-    "Watch all .scss files at any level in the src directoy that are added or changed"
+    "$0 src",
+    `All image files at any level in the src directory. Default image formats are: ${defaultImageTypes.join(
+      ", "
+    )}`
   )
   .example(
-    "$0 src/**/*.scss --includePaths src/core src/variables",
-    'Search the "core" and "variables" directory when resolving imports'
+    "$0 src/**/*.svg src/**/*.png",
+    "All .svg and .png files at any level in the src directory"
   )
   .example(
-    "$0 src/**/*.scss --aliases.~name variables",
-    'Replace all imports for "~name" with "variables"'
+    "$0 src/**/*.svg --watch",
+    "Watch all .svg files at any level in the src directory that are added or changed"
   )
   .example(
-    "$0 src/**/*.scss --aliasPrefixes.~ ./node_modules/",
-    'Replace the "~" prefix with "./node_modules/" for all imports beginning with "~"'
-  )
-  .example(
-    "$0 src/**/*.scss --ignore **/secret.scss",
-    'Ignore any file names "secret.scss"'
+    "$0 src/**/*.svg --ignore **/secret.svg",
+    'Ignore any file names "secret.svg"'
   )
   .demandCommand(1)
-  .option("aliases", {
-    coerce: (obj): Aliases => obj,
-    alias: "a",
-    describe: "Alias any import to any other value."
-  })
-  .option("aliasPrefixes", {
-    coerce: (obj): Aliases => obj,
-    alias: "p",
-    describe: "A prefix for any import to rewrite to another value."
-  })
   .option("nameFormat", {
     choices: NAME_FORMATS,
     default: nameFormatDefault,
     alias: "n",
-    describe: "The name format that should be used to transform class names."
+    describe:
+      "The name format that should be used to transform image variables."
   })
-  .option("exportType", {
-    choices: EXPORT_TYPES,
-    default: exportTypeDefault,
+  .option("variablePrefix", {
+    string: true,
+    alias: "p",
+    describe: "Additional prefix for variables."
+  })
+  .option("exportVariables", {
+    boolean: true,
+    default: false,
     alias: "e",
-    describe: "The type of export used for defining the type defintions."
+    describe: "Export variables for CSS modules."
   })
   .option("watch", {
     boolean: true,
@@ -80,17 +70,25 @@ const { _: patterns, ...rest } = yargs
     describe:
       "List any type definitions that are different than those that would be generated."
   })
-  .option("includePaths", {
-    array: true,
-    string: true,
-    alias: "i",
-    describe: "Additional paths to include when trying to resolve imports."
-  })
   .option("ignore", {
     string: true,
     array: true,
     default: [],
     describe: "Add a pattern or an array of glob patterns to exclude matches."
+  })
+  .option("imageFormats", {
+    string: true,
+    array: true,
+    default: defaultImageTypes,
+    alias: "f",
+    describe: `Add a pattern or an array of image formats.`
+  })
+  .option("moduleNameFormat", {
+    choices: NAME_FORMATS,
+    default: moduleNameFormatDefault,
+    alias: "m",
+    describe:
+      "The name format that should be used to transform export image variables."
   }).argv;
 
-main(patterns[0], { ...rest });
+main(patterns, { ...rest });

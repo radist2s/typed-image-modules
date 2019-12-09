@@ -1,33 +1,43 @@
-import fs from "fs";
 import path from "path";
 import slash from "slash";
 
-import { watch, MainOptions, generate, listDifferent } from "./core";
+import { generate, listDifferent, MainOptions, watch } from "./core";
+import * as fs from "fs";
 
-export const main = async (pattern: string, options: MainOptions) => {
-  // When the provided pattern is a directory construct the proper glob to find
-  // all .scss files within that directory. Also, add the directory to the
-  // included paths so any imported with a path relative to the root of the
-  // project still works as expected without adding many include paths.
-  if (fs.existsSync(pattern) && fs.lstatSync(pattern).isDirectory()) {
-    if (Array.isArray(options.includePaths)) {
-      options.includePaths.push(pattern);
-    } else {
-      options.includePaths = [pattern];
-    }
+function makePattern(imageFormat: string, pathGlob: string) {
+  return slash(path.resolve(pathGlob, `**/*.${imageFormat}`));
+}
 
-    // When the pattern provide is a directory, assume all .scss files within.
-    pattern = slash(path.resolve(pattern, "**/*.scss"));
+export const main = async (
+  filesGlob: string | string[],
+  options: MainOptions
+) => {
+  const { imageFormats } = options;
+
+  if (!imageFormats || !imageFormats.length) {
+    throw new Error("Image formats are empty");
   }
 
+  filesGlob = typeof filesGlob === "string" ? [filesGlob] : filesGlob;
+
+  const patterns: string[] = filesGlob.reduce((carry: string[], fileGlob) => {
+    if (fs.existsSync(fileGlob) && fs.lstatSync(fileGlob).isDirectory()) {
+      return carry.concat(
+        imageFormats.map(format => makePattern(format, fileGlob))
+      );
+    }
+
+    return carry.concat(fileGlob);
+  }, []);
+
   if (options.listDifferent) {
-    listDifferent(pattern, options);
+    listDifferent(patterns, options);
     return;
   }
 
   if (options.watch) {
-    watch(pattern, options);
+    watch(patterns, options);
   } else {
-    await generate(pattern, options);
+    await generate(patterns, options);
   }
 };

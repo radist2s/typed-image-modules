@@ -1,12 +1,8 @@
 import fs from "fs";
-import { SassError } from "node-sass";
 
 import { alerts } from "./alerts";
-import {
-  getTypeDefinitionPath,
-  classNamesToTypeDefinitions
-} from "../typescript";
-import { fileToClassNames } from "../sass";
+import { getDefinitionPath, classNamesToTypeDefinitions } from "../typescript";
+import { fileToImageSize } from "../sass";
 import { MainOptions } from "./types";
 
 /**
@@ -19,11 +15,11 @@ export const writeFile = (
   file: string,
   options: MainOptions
 ): Promise<void> => {
-  return fileToClassNames(file, options)
+  return fileToImageSize(file, options)
     .then(classNames => {
       const typeDefinition = classNamesToTypeDefinitions(
         classNames,
-        options.exportType
+        options.exportVariables
       );
 
       if (!typeDefinition) {
@@ -31,13 +27,12 @@ export const writeFile = (
         return;
       }
 
-      const path = getTypeDefinitionPath(file);
+      const path = getDefinitionPath(file);
 
       fs.writeFileSync(path, typeDefinition);
       alerts.success(`[GENERATED TYPES] ${path}`);
     })
-    .catch(({ message, file, line, column }: SassError) => {
-      const location = file ? `(${file}[${line}:${column}])` : "";
-      alerts.error(`${message} ${location}`);
+    .catch(message => {
+      alerts.error(`${file}\n${message}`);
     });
 };

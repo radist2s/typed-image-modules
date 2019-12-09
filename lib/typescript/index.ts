@@ -3,4 +3,4 @@ export {
   ExportType,
   EXPORT_TYPES
 } from "./class-names-to-type-definition";
-export { getTypeDefinitionPath } from "./get-type-definition-path";
+export { getDefinitionPath } from "./get-definition-path";
