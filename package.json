@@ -1,13 +1,13 @@
 {
-  "name": "typed-image-modules",
-  "version": "0.0.1",
+  "name": "@radist2s/typed-image-modules",
+  "version": "0.0.2-dev",
   "description": "SCSS type definition generator for images",
   "main": "index.js",
   "author": "Alex Batalov <radist2s@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/radist2s/typed-image-modules.git"
+    "url": "git+https://github.com/radist2s/typed-image-modules.git"
   },
   "homepage": "https://github.com/radist2s/typed-image-modules.git#readme",
   "keywords": [
@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "test": "jest",
-    "tsm": "ts-node ./lib/cli.ts",
+    "tim": "ts-node ./lib/cli.ts",
     "clean": "rm -rf ./dist",
     "build": "yarn clean && tsc",
     "prepack": "yarn build",
@@ -84,5 +84,13 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "bugs": {
+    "url": "https://github.com/radist2s/typed-image-modules/issues"
+  },
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "lib": "lib"
   }
 }
