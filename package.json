@@ -1,6 +1,6 @@
 {
   "name": "@radist2s/typed-image-modules",
-  "version": "0.0.2-dev",
+  "version": "0.0.3-dev",
   "description": "SCSS type definition generator for images",
   "main": "index.js",
   "author": "Alex Batalov <radist2s@gmail.com>",

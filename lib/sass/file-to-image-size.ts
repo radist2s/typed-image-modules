@@ -3,7 +3,7 @@ import { paramCase } from "param-case";
 import { imageSize } from "image-size";
 import path from "path";
 import { ISizeCalculationResult } from "image-size/dist/types/interface";
-import { nameFormatDefault, moduleNameFormatDefault } from "./index";
+import { moduleNameFormatDefault, nameFormatDefault } from "./index";
 
 export type ClassName = string;
 export type ClassNames = ClassName[];
@@ -54,17 +54,31 @@ export const fileToImageSize = (
   const transformerVariables = classNameTransformer(nameFormat);
   const transformerExported = classNameTransformer(moduleNameFormat);
 
+  function getVariableName(
+    fileName: string,
+    variableName: string,
+    transformer: Transformer
+  ) {
+    return transformer(
+      transformDefault(`${variablePrefix} ${fileName} ${variableName}`)
+    );
+  }
+
   function getVariablesMap(
     fileName: string,
     dimensions: ISizeCalculationResult,
     transformer: Transformer
   ): ImageVariablesMap {
     return {
-      [transformer(
-        transformDefault(`${variablePrefix} ${fileName} width`)
+      [getVariableName(
+        fileName,
+        "width",
+        transformer
       )]: `${dimensions.width}px`,
-      [transformer(
-        transformDefault(`${variablePrefix} ${fileName} height`)
+      [getVariableName(
+        fileName,
+        "height",
+        transformer
       )]: `${dimensions.height}px`
     };
   }
@@ -84,11 +98,20 @@ export const fileToImageSize = (
       const fileExtName = path.extname(file);
       const fileName = path.basename(file, fileExtName);
 
+      const variables = {
+        ...getVariablesMap(fileName, dimensions, transformerVariables),
+        [getVariableName(
+          fileName,
+          "size",
+          transformerVariables
+        )]: `(width: ${dimensions.width}px, height: ${dimensions.height}px)`
+      };
+
       resolve({
         moduleName: transformerVariables(fileName),
         moduleFullName: transformerVariables(`${fileName}${fileExtName}`),
         dimensions,
-        variables: getVariablesMap(fileName, dimensions, transformerVariables),
+        variables,
         exportedVariables: getVariablesMap(
           fileName,
           dimensions,
